@@ -41,12 +41,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { FileInput, FileUploader } from '@/components/ui/file-input';
 import { DropzoneOptions } from 'react-dropzone';
 import { Label } from '@/components/ui/label';
-import {
-	Doctors,
-	GenderOptions,
-	IdentificationTypes,
-	Images,
-} from '@/lib/constants';
+import { Doctors, GenderOptions, IdentificationTypes } from '@/lib/constants';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createPatient, getUserData } from '@/lib/actions';
@@ -130,7 +125,9 @@ export default function RegistrationPage() {
 		<FormLayout
 			subtitle='Let us know more about you.'
 			title='Welcome'
-			img={Images.registrationPageBackground}>
+			img={
+				import.meta.env.BASE_URL + 'images/registration-page-background.png'
+			}>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className='grid gap-8'>
 					<h2 className='text-2xl font-semibold'>Personal Information</h2>

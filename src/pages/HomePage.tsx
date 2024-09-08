@@ -16,7 +16,6 @@ import { Mail, UserRound } from 'lucide-react';
 import { PhoneInput } from '@/components/ui/phone-input';
 import PasskeyModal from '@/components/passkey-modal';
 import FormLayout from '@/components/form-layout';
-import { Images } from '@/lib/constants';
 import { createUser } from '@/lib/actions';
 import { useNavigate } from 'react-router-dom';
 import Loader from '@/components/loader';
@@ -44,7 +43,7 @@ export default function HomePage() {
 				showAdmin
 				subtitle='Get started with appointments.'
 				title='Hey there'
-				img={Images.homePageBackground}>
+				img={import.meta.env.BASE_URL + 'images/home-page-background.png'}>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='grid gap-4'>
 						<FormField

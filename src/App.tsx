@@ -7,36 +7,39 @@ import { ProtectedRoute } from './components/protected-route';
 import SuccessPage from './pages/SuccessPage';
 import { Toaster } from './components/ui/toaster';
 
-const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <HomePage />,
-	},
-	{
-		path: '/:userId/register',
-		element: <RegistrationPage />,
-	},
-	{
-		path: '/:userId/new-appointment',
-		element: <AppointmentPage />,
-	},
-	{
-		path: '/:userId/appointment/:appointmentId',
-		element: <AppointmentPage />,
-	},
-	{
-		path: '/:userId/appointment/:appointmentId/success',
-		element: <SuccessPage />,
-	},
-	{
-		path: '/dashboard',
-		element: (
-			<ProtectedRoute>
-				<Dashboard />
-			</ProtectedRoute>
-		),
-	},
-]);
+const router = createBrowserRouter(
+	[
+		{
+			path: '/',
+			element: <HomePage />,
+		},
+		{
+			path: '/:userId/register',
+			element: <RegistrationPage />,
+		},
+		{
+			path: '/:userId/new-appointment',
+			element: <AppointmentPage />,
+		},
+		{
+			path: '/:userId/appointment/:appointmentId',
+			element: <AppointmentPage />,
+		},
+		{
+			path: '/:userId/appointment/:appointmentId/success',
+			element: <SuccessPage />,
+		},
+		{
+			path: '/dashboard',
+			element: (
+				<ProtectedRoute>
+					<Dashboard />
+				</ProtectedRoute>
+			),
+		},
+	],
+	{ basename: import.meta.env.BASE_URL }
+);
 
 function App() {
 	return (

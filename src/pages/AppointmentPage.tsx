@@ -23,7 +23,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Doctors, Images } from '@/lib/constants';
+import { Doctors } from '@/lib/constants';
 import { createAppointmentSchema } from '@/lib/formSchemas';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -72,7 +72,9 @@ export default function AppointmentPage() {
 		<FormLayout
 			subtitle='Request a new appointment in 10 seconds.'
 			title='New Appointment'
-			img={Images.homePageBackground}>
+			img={
+				import.meta.env.BASE_URL + 'images/registration-page-background.png'
+			}>
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
