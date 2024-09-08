@@ -20,10 +20,10 @@ jobs:
           node-version: '20'
 
       - name: Install pnpm
-        run: npm i -g pnpm
+        run: npm install -g pnpm
 
       - name: Install dependencies
-        uses: pnpm i
+        run: pnpm install
 
       - name: Build project
         env:
@@ -33,7 +33,7 @@ jobs:
           VITE_APPWRITE_DATABASE_ID: ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
           VITE_APPWRITE_PATIENT_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_PATIENT_COLLECTION_ID }}
           VITE_APPWRITE_APPOINTMENT_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_APPOINTMENT_COLLECTION_ID }}
-        run: pnpm build
+        run: pnpm run build
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
