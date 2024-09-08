@@ -11,4 +11,12 @@ export default defineConfig({
 		},
 	},
 	base: '/careX/', // YOUR REPO NAME HERE
+	build: {
+		rollupOptions: {
+			input: {
+				main: './index.html',
+				404: './public/404.html', // Ensure 404.html is included in the build
+			},
+		},
+	},
 });
