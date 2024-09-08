@@ -1,30 +1,78 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
-import { Ban, CalendarCheck2, Hourglass } from 'lucide-react';
+import { ArrowUpDown, Ban, CalendarCheck2, Hourglass } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Doctors } from '@/lib/constants';
+import { AppointmentModal } from '../appointment-modal';
+import { Checkbox } from '../ui/checkbox';
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-	id: string;
-	amount: number;
-	status: 'pending' | 'cancelled' | 'scheduled';
-	email: string;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Appointment>[] = [
+	// {
+	// 	id: 'select',
+	// 	header: ({ table }) => (
+	// 		<Checkbox
+	// 			checked={
+	// 				table.getIsAllPageRowsSelected() ||
+	// 				(table.getIsSomePageRowsSelected() && 'indeterminate')
+	// 			}
+	// 			onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+	// 			aria-label='Select all'
+	// 		/>
+	// 	),
+	// 	cell: ({ row }) => (
+	// 		<Checkbox
+	// 			checked={row.getIsSelected()}
+	// 			onCheckedChange={value => row.toggleSelected(!!value)}
+	// 			aria-label='Select row'
+	// 		/>
+	// 	),
+	// },
 	{
-		accessorKey: 'status',
-		header: 'Status',
+		accessorKey: 'appointmentId',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					ID
+					<ArrowUpDown className='ml-2 h-4 w-4' />
+				</Button>
+			);
+		},
+		cell: ({ row }) => {
+			return (
+				<span className='font-medium truncate'>
+					{row.original.appointmentId}
+				</span>
+			);
+		},
 	},
 	{
-		accessorKey: 'email',
-		header: 'Email',
+		accessorKey: 'patient',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Patient
+					<ArrowUpDown className='ml-2 h-4 w-4' />
+				</Button>
+			);
+		},
 	},
 	{
 		accessorKey: 'status',
-		header: 'Status',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Status
+					<ArrowUpDown className='ml-2 h-4 w-4' />
+				</Button>
+			);
+		},
 		cell: ({ row }) => {
 			const { status } = row.original;
 			return (
@@ -58,46 +106,64 @@ export const columns: ColumnDef<Payment>[] = [
 		},
 	},
 	{
-		accessorKey: 'amount',
-		header: () => <div className='text-right'>Amount</div>,
+		accessorKey: 'schedule',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Appointment
+					<ArrowUpDown className='ml-2 h-4 w-4' />
+				</Button>
+			);
+		},
 		cell: ({ row }) => {
-			const amount = parseFloat(row.getValue('amount'));
-			const formatted = new Intl.NumberFormat('en-US', {
-				style: 'currency',
-				currency: 'USD',
-			}).format(amount);
+			const formatted = new Intl.DateTimeFormat('en-US', {
+				dateStyle: 'full',
+			}).format(new Date(row.original.schedule));
 
-			return <div className='text-right font-medium'>{formatted}</div>;
+			return <div className='font-medium'>{formatted}</div>;
+		},
+	},
+	{
+		accessorKey: 'primaryPhysician',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Doctor
+					<ArrowUpDown className='ml-2 h-4 w-4' />
+				</Button>
+			);
+		},
+		cell: ({ row }) => {
+			const { primaryPhysician } = row.original;
+			const doctor = Doctors.find(doc => doc.name === primaryPhysician)!;
+			return (
+				<div className='flex cursor-pointer items-center gap-2'>
+					<img
+						src={doctor.image}
+						alt='doctor'
+						className='size-8 rounded-full border border-dark-500'
+					/>
+					<p>{doctor.name}</p>
+				</div>
+			);
 		},
 	},
 	{
 		id: 'actions',
-		header: () => <div className='text-center'>Actions</div>,
+		header: () => 'Actions',
 		cell: ({ row }) => {
 			const appointment = row.original;
 
+			if (appointment.status !== 'pending') return null;
+
 			return (
-				<div className='flex justify-end gap-4'>
-					<Button size={'sm'}>Schedule</Button>
-					<Button size={'sm'} variant={'outline'}>
-						<span>Cancel</span>
-					</Button>
-					{/* <AppointmentModal
-            patientId={appointment.patient.$id}
-            userId={appointment.userId}
-            appointment={appointment}
-            type="schedule"
-            title="Schedule Appointment"
-            description="Please confirm the following details to schedule."
-          />
-          <AppointmentModal
-            patientId={appointment.patient.$id}
-            userId={appointment.userId}
-            appointment={appointment}
-            type="cancel"
-            title="Cancel Appointment"
-            description="Are you sure you want to cancel your appointment?"
-          /> */}
+				<div className='space-x-4 space-y-2'>
+					<AppointmentModal type='schedule' appointment={appointment} />
+					<AppointmentModal type='cancel' appointment={appointment} />
 				</div>
 			);
 		},

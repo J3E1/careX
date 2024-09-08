@@ -48,33 +48,44 @@ import {
 	Images,
 } from '@/lib/constants';
 import { Checkbox } from '@/components/ui/checkbox';
-type Props = {};
-export default function RegistrationPage({}: Props) {
+import { useNavigate, useParams } from 'react-router-dom';
+import { createPatient, getUserData } from '@/lib/actions';
+import Loader from '@/components/loader';
+import { toast } from '@/hooks/use-toast';
+
+export default function RegistrationPage() {
+	const params = useParams();
+
+	const navigate = useNavigate();
+
 	const form = useForm<z.infer<typeof userRegisterFormSchema>>({
 		resolver: zodResolver(userRegisterFormSchema),
-		defaultValues: {
-			username: '',
-			email: '',
-			phone: '',
-			birthDate: new Date(Date.now()),
-			gender: 'Male',
-			address: '',
-			occupation: '',
-			emergencyContactName: '',
-			emergencyContactNumber: '',
-			primaryPhysician: '',
-			insuranceProvider: '',
-			insurancePolicyNumber: '',
-			allergies: '',
-			currentMedication: '',
-			familyMedicalHistory: '',
-			pastMedicalHistory: '',
-			identificationType: 'Birth Certificate',
-			identificationNumber: '',
-			identificationDocument: [],
-			treatmentConsent: false,
-			disclosureConsent: false,
-			privacyConsent: false,
+		defaultValues: async () => {
+			const user = await getUserData(params.userId as string);
+			return {
+				username: user?.username || '',
+				email: user?.email || '',
+				phone: user?.phone || '',
+				birthDate: new Date(Date.now()),
+				gender: 'Male',
+				address: '',
+				occupation: '',
+				emergencyContactName: '',
+				emergencyContactNumber: '',
+				primaryPhysician: '',
+				insuranceProvider: '',
+				insurancePolicyNumber: '',
+				allergies: '',
+				currentMedication: '',
+				familyMedicalHistory: '',
+				pastMedicalHistory: '',
+				identificationType: 'Birth Certificate',
+				identificationNumber: '',
+				identificationDocument: [],
+				treatmentConsent: false,
+				disclosureConsent: false,
+				privacyConsent: false,
+			};
 		},
 	});
 
@@ -87,10 +98,33 @@ export default function RegistrationPage({}: Props) {
 		maxSize: 1 * 1024 * 1024,
 	} satisfies DropzoneOptions;
 
-	function onSubmit(values: z.infer<typeof userRegisterFormSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log(values);
+	async function onSubmit(values: z.infer<typeof userRegisterFormSchema>) {
+		const user = {
+			userId: params.userId || '',
+			birthDate: values.birthDate,
+			gender: values.gender,
+			address: values.address,
+			occupation: values.occupation,
+			emergencyContactName: values.emergencyContactName,
+			emergencyContactNumber: values.emergencyContactNumber,
+			primaryPhysician: values.primaryPhysician,
+			insuranceProvider: values.insuranceProvider,
+			insurancePolicyNumber: values.insurancePolicyNumber,
+			allergies: values.allergies,
+			currentMedication: values.currentMedication,
+			familyMedicalHistory: values.familyMedicalHistory,
+			pastMedicalHistory: values.pastMedicalHistory,
+			identificationType: values.identificationType,
+			identificationNumber: values.identificationNumber,
+			privacyConsent: values.privacyConsent,
+			disclosureConsent: values.disclosureConsent,
+			treatmentConsent: values.treatmentConsent,
+		};
+
+		await createPatient(user, navigate);
+		toast({
+			title: 'Your details has been submitted.',
+		});
 	}
 	return (
 		<FormLayout
@@ -585,7 +619,11 @@ export default function RegistrationPage({}: Props) {
 							)}
 						/>
 					</div>
-					<Button type='submit' className='w-full'>
+					<Button
+						type='submit'
+						className='w-full'
+						disabled={form.formState.isSubmitting}>
+						{form.formState.isSubmitting && <Loader />}
 						Submit
 					</Button>
 				</form>

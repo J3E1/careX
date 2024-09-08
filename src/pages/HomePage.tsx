@@ -17,9 +17,13 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import PasskeyModal from '@/components/passkey-modal';
 import FormLayout from '@/components/form-layout';
 import { Images } from '@/lib/constants';
+import { createUser } from '@/lib/actions';
+import { useNavigate } from 'react-router-dom';
+import Loader from '@/components/loader';
 
-type Props = {};
-export default function HomePage({}: Props) {
+export default function HomePage() {
+	const navigate = useNavigate();
+
 	const form = useForm<z.infer<typeof userFormSchema>>({
 		resolver: zodResolver(userFormSchema),
 		defaultValues: {
@@ -30,9 +34,7 @@ export default function HomePage({}: Props) {
 	});
 
 	function onSubmit(values: z.infer<typeof userFormSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log(values);
+		createUser(values, navigate);
 	}
 
 	return (
@@ -105,7 +107,11 @@ export default function HomePage({}: Props) {
 							)}
 						/>
 
-						<Button type='submit' className='w-full'>
+						<Button
+							type='submit'
+							className='w-full'
+							disabled={form.formState.isSubmitting}>
+							{form.formState.isSubmitting && <Loader />}
 							Submit
 						</Button>
 					</form>

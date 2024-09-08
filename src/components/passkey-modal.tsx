@@ -16,9 +16,9 @@ import {
 	InputOTPSeparator,
 	InputOTPSlot,
 } from './ui/input-otp';
+const PASSKEY = import.meta.env.VITE_ADMIN_PASSKEY;
 
-type Props = {};
-export default function PasskeyModal({}: Props) {
+export default function PasskeyModal() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 
@@ -36,10 +36,10 @@ export default function PasskeyModal({}: Props) {
 
 	useEffect(() => {
 		const localPassKey = localStorage.getItem('passkey');
-		if (btoa('111111') === localPassKey) {
-			// navigate('/admin');
+		if (btoa(PASSKEY) === localPassKey) {
+			navigate('/dashboard');
 		}
-	}, []);
+	}, [navigate]);
 
 	const onChangeModal = (currentlyOpen: boolean) => {
 		if (!currentlyOpen) {
@@ -60,11 +60,11 @@ export default function PasskeyModal({}: Props) {
 			return;
 		}
 
-		if (passkey === '111111') {
+		if (passkey === PASSKEY) {
 			const encryptedPasskeyString = btoa(passkey);
 			localStorage.setItem('passkey', encryptedPasskeyString);
 			setError('');
-			// navigate('/admin');
+			navigate('/dashboard');
 			setIsOpen(false);
 		} else {
 			setError('Invalid passkey. Please try again.');

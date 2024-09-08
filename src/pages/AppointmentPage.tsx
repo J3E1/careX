@@ -30,23 +30,43 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { createAppointment, getUserData } from '@/lib/actions';
+import { useNavigate, useParams } from 'react-router-dom';
+import Loader from '@/components/loader';
+import { toast } from '@/hooks/use-toast';
 
-type Props = {};
-export default function AppointmentPage({}: Props) {
+export default function AppointmentPage() {
+	const params = useParams();
+
+	const navigate = useNavigate();
 	const form = useForm<z.infer<typeof createAppointmentSchema>>({
 		resolver: zodResolver(createAppointmentSchema),
 		defaultValues: {
 			schedule: new Date(),
 			note: '',
 			primaryPhysician: '',
-			reason: '',
+			appointmentReason: '',
 		},
 	});
 
-	function onSubmit(values: z.infer<typeof createAppointmentSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log(values);
+	async function onSubmit(values: z.infer<typeof createAppointmentSchema>) {
+		const user = await getUserData(params.userId as string);
+
+		const appointment: CreateAppointmentParams = {
+			userId: params.userId as string,
+			patient: user?.username || 'NA',
+			primaryPhysician: values.primaryPhysician,
+			appointmentReason: values.appointmentReason,
+			schedule: values.schedule,
+			status: 'pending',
+			note: values.note,
+		};
+		await createAppointment(appointment, navigate);
+		toast({
+			title: 'Appointment Requested',
+			description:
+				'Your appointment has been requested. We will get back to you shortly.',
+		});
 	}
 	return (
 		<FormLayout
@@ -54,7 +74,9 @@ export default function AppointmentPage({}: Props) {
 			title='New Appointment'
 			img={Images.homePageBackground}>
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className='grid grid-cols-2 gap-y-8 gap-x-4'>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className='grid grid-cols-2 gap-y-8 gap-x-4'>
 					<FormField
 						control={form.control}
 						name='primaryPhysician'
@@ -119,7 +141,7 @@ export default function AppointmentPage({}: Props) {
 											selected={field.value}
 											onSelect={field.onChange}
 											disabled={date =>
-												date > new Date() || date < new Date('1900-01-01')
+												date < new Date() || date > new Date('2030-01-01')
 											}
 											initialFocus
 										/>
@@ -132,7 +154,7 @@ export default function AppointmentPage({}: Props) {
 
 					<FormField
 						control={form.control}
-						name='reason'
+						name='appointmentReason'
 						render={({ field }) => (
 							<FormItem className='col-span-2 md:col-span-1'>
 								<FormLabel>Appointment reason</FormLabel>
@@ -149,6 +171,7 @@ export default function AppointmentPage({}: Props) {
 								<FormLabel>Comments/notes</FormLabel>
 								<Textarea
 									{...field}
+									value={field.value || ''}
 									placeholder='Prefer afternoon appointments, if possible'
 								/>
 								<FormMessage />
@@ -156,7 +179,11 @@ export default function AppointmentPage({}: Props) {
 						)}
 					/>
 
-					<Button type='submit' className='w-full col-span-2'>
+					<Button
+						type='submit'
+						className='w-full col-span-2'
+						disabled={form.formState.isSubmitting}>
+						{form.formState.isSubmitting && <Loader />}
 						Submit
 					</Button>
 				</form>
