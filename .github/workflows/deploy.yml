@@ -16,9 +16,14 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm i -g pnpm
 
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        uses: pnpm i
 
       - name: Build project
         env:
@@ -28,7 +33,7 @@ jobs:
           VITE_APPWRITE_DATABASE_ID: ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
           VITE_APPWRITE_PATIENT_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_PATIENT_COLLECTION_ID }}
           VITE_APPWRITE_APPOINTMENT_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_APPOINTMENT_COLLECTION_ID }}
-        run: npm run build
+        run: pnpm build
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
