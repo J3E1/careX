@@ -5,7 +5,6 @@ import { ArrowUpDown, Ban, CalendarCheck2, Hourglass } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Doctors } from '@/lib/constants';
 import { AppointmentModal } from '../appointment-modal';
-import { Checkbox } from '../ui/checkbox';
 
 export const columns: ColumnDef<Appointment>[] = [
 	// {
